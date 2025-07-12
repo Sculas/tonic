@@ -21,6 +21,26 @@ pub struct Request<T> {
     extensions: Extensions,
 }
 
+impl<T> AsRef<T> for Request<T> {
+    fn as_ref(&self) -> &T {
+        &self.message
+    }
+}
+
+impl<T> std::ops::Deref for Request<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.message
+    }
+}
+
+impl<T> std::ops::DerefMut for Request<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.message
+    }
+}
+
 /// Trait implemented by RPC request types.
 ///
 /// Types implementing this trait can be used as arguments to client RPC
@@ -500,5 +520,15 @@ mod tests {
         let one_hour = Duration::from_secs(60 * 60);
         let value = duration_to_grpc_timeout(one_hour);
         assert_eq!(value, format!("{}m", one_hour.as_millis()));
+    }
+
+    #[test]
+    fn request_deref() {
+        let req = Request::new(42);
+        assert_eq!(*req, 42);
+
+        let mut req = Request::new(42);
+        *req = 43;
+        assert_eq!(*req, 43);
     }
 }
