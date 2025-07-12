@@ -133,6 +133,26 @@ impl<T> From<T> for Response<T> {
     }
 }
 
+impl<T> AsRef<T> for Response<T> {
+    fn as_ref(&self) -> &T {
+        &self.message
+    }
+}
+
+impl<T> std::ops::Deref for Response<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.message
+    }
+}
+
+impl<T> std::ops::DerefMut for Response<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.message
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -151,5 +171,15 @@ mod tests {
 
         let http_response = r.into_http();
         assert!(http_response.headers().is_empty());
+    }
+
+    #[test]
+    fn response_deref() {
+        let res = Response::new(42);
+        assert_eq!(*res, 42);
+
+        let mut res = Response::new(42);
+        *res = 43;
+        assert_eq!(*res, 43);
     }
 }
