@@ -64,7 +64,7 @@ pub struct Response<T> {
 ///       Ok(Feature {})
 ///     }
 ///
-///     // you can also implement `IntoResponse` for your own types, like `axum::response::IntoResponse`
+///     // you can also implement `IntoResponse` for your own types, just like `axum::response::IntoResponse`
 ///     async fn get_special_feature(&self, request: Request<Point>) -> Result<impl IntoResponse<SpecialFeature>, Status> {
 ///       Ok(SpecialFeature { index: 42 })
 ///     }

@@ -266,7 +266,7 @@ fn generate_trait_methods<T: Service>(
                 quote! {
                     #method_doc
                     async fn #name(#self_param, request: tonic::Request<#req_message>)
-                        -> std::result::Result<impl tonic::IntoResponse<#res_message>, tonic::Status> {
+                        -> std::result::Result<impl tonic::IntoResponse<#res_message>, impl tonic::IntoStatus> {
                         Err::<tonic::Response<_>, _>(tonic::Status::unimplemented("Not yet implemented"))
                     }
                 }
@@ -275,14 +275,14 @@ fn generate_trait_methods<T: Service>(
                 quote! {
                     #method_doc
                     async fn #name(#self_param, request: tonic::Request<#req_message>)
-                        -> std::result::Result<impl tonic::IntoResponse<#res_message>, tonic::Status>;
+                        -> std::result::Result<impl tonic::IntoResponse<#res_message>, impl tonic::IntoStatus>;
                 }
             }
             (true, false, true) => {
                 quote! {
                     #method_doc
                     async fn #name(#self_param, request: tonic::Request<tonic::Streaming<#req_message>>)
-                        -> std::result::Result<impl tonic::IntoResponse<#res_message>, tonic::Status> {
+                        -> std::result::Result<impl tonic::IntoResponse<#res_message>, impl tonic::IntoStatus> {
                         Err::<tonic::Response<_>, _>(tonic::Status::unimplemented("Not yet implemented"))
                     }
                 }
@@ -291,14 +291,14 @@ fn generate_trait_methods<T: Service>(
                 quote! {
                     #method_doc
                     async fn #name(#self_param, request: tonic::Request<tonic::Streaming<#req_message>>)
-                        -> std::result::Result<impl tonic::IntoResponse<#res_message>, tonic::Status>;
+                        -> std::result::Result<impl tonic::IntoResponse<#res_message>, impl tonic::IntoStatus>;
                 }
             }
             (false, true, true) => {
                 quote! {
                     #method_doc
                     async fn #name(#self_param, request: tonic::Request<#req_message>)
-                        -> std::result::Result<impl tonic::IntoResponse<BoxStream<#res_message>>, tonic::Status> {
+                        -> std::result::Result<impl tonic::IntoResponse<BoxStream<#res_message>>, impl tonic::IntoStatus> {
                         Err::<tonic::Response<_>, _>(tonic::Status::unimplemented("Not yet implemented"))
                     }
                 }
@@ -316,14 +316,14 @@ fn generate_trait_methods<T: Service>(
 
                     #method_doc
                     async fn #name(#self_param, request: tonic::Request<#req_message>)
-                        -> std::result::Result<impl tonic::IntoResponse<Self::#stream>, tonic::Status>;
+                        -> std::result::Result<impl tonic::IntoResponse<Self::#stream>, impl tonic::IntoStatus>;
                 }
             }
             (true, true, true) => {
                 quote! {
                     #method_doc
                     async fn #name(#self_param, request: tonic::Request<tonic::Streaming<#req_message>>)
-                        -> std::result::Result<impl tonic::IntoResponse<BoxStream<#res_message>>, tonic::Status> {
+                        -> std::result::Result<impl tonic::IntoResponse<BoxStream<#res_message>>, impl tonic::IntoStatus> {
                         Err::<tonic::Response<_>, _>(tonic::Status::unimplemented("Not yet implemented"))
                     }
                 }
@@ -341,7 +341,7 @@ fn generate_trait_methods<T: Service>(
 
                     #method_doc
                     async fn #name(#self_param, request: tonic::Request<tonic::Streaming<#req_message>>)
-                        -> std::result::Result<impl tonic::IntoResponse<Self::#stream>, tonic::Status>;
+                        -> std::result::Result<impl tonic::IntoResponse<Self::#stream>, impl tonic::IntoStatus>;
                 }
             }
         };
@@ -465,6 +465,7 @@ fn generate_unary<T: Method>(
                 let fut = async move {
                     <T as #server_trait>::#method_ident(#inner_arg, request).await
                         .map(tonic::IntoResponse::into_response)
+                        .map_err(tonic::IntoStatus::into_status)
                 };
                 Box::pin(fut)
             }
@@ -533,6 +534,7 @@ fn generate_server_streaming<T: Method>(
                 let fut = async move {
                     <T as #server_trait>::#method_ident(#inner_arg, request).await
                         .map(tonic::IntoResponse::into_response)
+                        .map_err(tonic::IntoStatus::into_status)
                 };
                 Box::pin(fut)
             }
@@ -592,6 +594,7 @@ fn generate_client_streaming<T: Method>(
                 let fut = async move {
                     <T as #server_trait>::#method_ident(#inner_arg, request).await
                         .map(tonic::IntoResponse::into_response)
+                        .map_err(tonic::IntoStatus::into_status)
                 };
                 Box::pin(fut)
             }
@@ -661,6 +664,7 @@ fn generate_streaming<T: Method>(
                 let fut = async move {
                     <T as #server_trait>::#method_ident(#inner_arg, request).await
                         .map(tonic::IntoResponse::into_response)
+                        .map_err(tonic::IntoStatus::into_status)
                 };
                 Box::pin(fut)
             }

@@ -122,7 +122,7 @@ pub use extensions::GrpcMethod;
 pub use http::Extensions;
 pub use request::{IntoRequest, IntoStreamingRequest, Request};
 pub use response::{IntoResponse, Response};
-pub use status::{Code, ConnectError, Status, TimeoutExpired};
+pub use status::{Code, ConnectError, IntoStatus, Status, TimeoutExpired};
 
 pub(crate) type BoxError = Box<dyn std::error::Error + Send + Sync>;
 
