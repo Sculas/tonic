@@ -70,7 +70,7 @@ impl<T> std::ops::DerefMut for Request<T> {
 /// client.get_feature(Point {});
 /// client.get_feature(Request::new(Point {}));
 /// ```
-pub trait IntoRequest<T>: sealed::Sealed {
+pub trait IntoRequest<T> {
     /// Wrap the input message `T` in a `tonic::Request`
     fn into_request(self) -> Request<T>;
 }
@@ -94,8 +94,8 @@ pub trait IntoRequest<T>: sealed::Sealed {
 ///
 /// ```rust
 /// # #[derive(Clone)]
-/// # pub struct Point {};
-/// # pub struct Client {};
+/// # pub struct Point {}
+/// # pub struct Client {}
 /// # impl Client {
 /// #   fn record_route(&self, r: impl tonic::IntoStreamingRequest<Message = Point>) {}
 /// # }
@@ -107,7 +107,7 @@ pub trait IntoRequest<T>: sealed::Sealed {
 /// client.record_route(Request::new(tokio_stream::iter(messages.clone())));
 /// client.record_route(tokio_stream::iter(messages));
 /// ```
-pub trait IntoStreamingRequest: sealed::Sealed {
+pub trait IntoStreamingRequest {
     /// The RPC request stream type
     type Stream: Stream<Item = Self::Message> + Send + 'static;
 
@@ -406,12 +406,6 @@ where
     fn into_streaming_request(self) -> Self {
         self
     }
-}
-
-impl<T> sealed::Sealed for T {}
-
-mod sealed {
-    pub trait Sealed {}
 }
 
 fn duration_to_grpc_timeout(duration: Duration) -> String {
