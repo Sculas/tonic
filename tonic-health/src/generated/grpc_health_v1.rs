@@ -221,8 +221,8 @@ pub mod health_server {
             &self,
             request: tonic::Request<super::HealthCheckRequest>,
         ) -> std::result::Result<
-            tonic::Response<super::HealthCheckResponse>,
-            tonic::Status,
+            impl tonic::IntoResponse<super::HealthCheckResponse>,
+            impl tonic::IntoStatus,
         >;
         /// Server streaming response type for the Watch method.
         type WatchStream: tonic::codegen::tokio_stream::Stream<
@@ -248,7 +248,10 @@ pub mod health_server {
         async fn watch(
             &self,
             request: tonic::Request<super::HealthCheckRequest>,
-        ) -> std::result::Result<tonic::Response<Self::WatchStream>, tonic::Status>;
+        ) -> std::result::Result<
+            impl tonic::IntoResponse<Self::WatchStream>,
+            impl tonic::IntoStatus,
+        >;
     }
     #[derive(Debug)]
     pub struct HealthServer<T> {
@@ -344,7 +347,10 @@ pub mod health_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as Health>::check(&inner, request).await
+                                <T as Health>::check(&inner, request)
+                                    .await
+                                    .map(tonic::IntoResponse::into_response)
+                                    .map_err(tonic::IntoStatus::into_status)
                             };
                             Box::pin(fut)
                         }
@@ -390,7 +396,10 @@ pub mod health_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as Health>::watch(&inner, request).await
+                                <T as Health>::watch(&inner, request)
+                                    .await
+                                    .map(tonic::IntoResponse::into_response)
+                                    .map_err(tonic::IntoStatus::into_status)
                             };
                             Box::pin(fut)
                         }

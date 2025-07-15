@@ -287,8 +287,8 @@ pub mod server_reflection_server {
             &self,
             request: tonic::Request<tonic::Streaming<super::ServerReflectionRequest>>,
         ) -> std::result::Result<
-            tonic::Response<Self::ServerReflectionInfoStream>,
-            tonic::Status,
+            impl tonic::IntoResponse<Self::ServerReflectionInfoStream>,
+            impl tonic::IntoStatus,
         >;
     }
     #[derive(Debug)]
@@ -393,6 +393,8 @@ pub mod server_reflection_server {
                                         request,
                                     )
                                     .await
+                                    .map(tonic::IntoResponse::into_response)
+                                    .map_err(tonic::IntoStatus::into_status)
                             };
                             Box::pin(fut)
                         }

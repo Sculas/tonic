@@ -11,7 +11,8 @@ bytes = "1.0"
 prost = "0.14"
 tokio = {version = "1.0", features = ["macros", "rt-multi-thread", "net", "sync"]}
 tonic = {path = "../../tonic"}
-tracing-subscriber = {version = "0.3"}
+tracing-subscriber = "0.3"
+futures-util = "0.3"
 
 [dev-dependencies]
 http = "1"

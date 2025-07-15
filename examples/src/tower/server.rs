@@ -45,6 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .layer(MyMiddlewareLayer::default())
         // Interceptors can be also be applied as middleware
         .layer(tonic::service::InterceptorLayer::new(intercept))
+        .layer(tonic::service::AsyncInterceptorLayer::new(async_intercept))
         .into_inner();
 
     Server::builder()
@@ -59,6 +60,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 // An interceptor function.
 fn intercept(req: Request<()>) -> Result<Request<()>, Status> {
+    Ok(req)
+}
+
+// An async interceptor function.
+async fn async_intercept(req: Request<()>) -> Result<Request<()>, Status> {
     Ok(req)
 }
 
