@@ -1,5 +1,5 @@
-use http::Extensions;
 use crate::metadata::MetadataMap;
+use http::Extensions;
 
 /// A gRPC response and metadata from an RPC call.
 #[derive(Debug)]
