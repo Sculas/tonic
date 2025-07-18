@@ -11,14 +11,14 @@ use tower::{Service, ServiceExt};
 
 /// A [`Service`] router.
 #[derive(Debug, Clone)]
-pub struct Routes {
-    router: axum::Router,
+pub struct Routes<State = ()> {
+    router: axum::Router<State>,
 }
 
 #[derive(Debug, Default, Clone)]
 /// Allows adding new services to routes by passing a mutable reference to this builder.
-pub struct RoutesBuilder {
-    routes: Option<Routes>,
+pub struct RoutesBuilder<State = ()> {
+    routes: Option<Routes<State>>,
 }
 
 impl RoutesBuilder {
@@ -45,7 +45,7 @@ impl RoutesBuilder {
     }
 }
 
-impl Default for Routes {
+impl<State: Clone + Send + Sync + 'static> Default for Routes<State> {
     fn default() -> Self {
         Self {
             router: axum::Router::new().fallback(unimplemented),
@@ -53,7 +53,7 @@ impl Default for Routes {
     }
 }
 
-impl Routes {
+impl<State: Clone + Send + Sync + 'static> Routes<State> {
     /// Create a new routes with `svc` already added to it.
     pub fn new<S>(svc: S) -> Self
     where
@@ -93,6 +93,18 @@ impl Routes {
         self
     }
 
+    /// Convert this `Routes` into an [`axum::Router`].
+    pub fn into_axum_router(self) -> axum::Router<State> {
+        self.router
+    }
+
+    /// Get a mutable reference to the [`axum::Router`].
+    pub fn axum_router_mut(&mut self) -> &mut axum::Router<State> {
+        &mut self.router
+    }
+}
+
+impl Routes<()> {
     /// This makes axum perform update some internals of the router that improves perf.
     ///
     /// See <https://docs.rs/axum/latest/axum/routing/struct.Router.html#a-note-about-performance>
@@ -100,16 +112,6 @@ impl Routes {
         Self {
             router: self.router.with_state(()),
         }
-    }
-
-    /// Convert this `Routes` into an [`axum::Router`].
-    pub fn into_axum_router(self) -> axum::Router {
-        self.router
-    }
-
-    /// Get a mutable reference to the [`axum::Router`].
-    pub fn axum_router_mut(&mut self) -> &mut axum::Router {
-        &mut self.router
     }
 }
 
