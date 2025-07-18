@@ -138,8 +138,7 @@ impl From<axum::Router> for Routes {
 }
 
 async fn unimplemented() -> Response<Body> {
-    let (parts, ()) = Status::unimplemented("").into_http::<()>().into_parts();
-    Response::from_parts(parts, Body::empty())
+    Status::unimplemented("").into_http()
 }
 
 impl<B> Service<Request<B>> for Routes

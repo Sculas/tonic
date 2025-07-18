@@ -72,6 +72,24 @@ where
     }
 }
 
+/// A trait to convert an interceptor into a [`Layer`].
+pub trait IntoInterceptorLayer<S, L: Layer<S>> {
+    /// Convert the interceptor into a layer.
+    fn into_layer(self) -> L;
+}
+
+impl<I: Interceptor + Clone> IntoInterceptorLayer<I, InterceptorLayer<I>> for I {
+    fn into_layer(self) -> InterceptorLayer<I> {
+        InterceptorLayer::new(self)
+    }
+}
+
+impl<I: AsyncInterceptor + Clone> IntoInterceptorLayer<I, AsyncInterceptorLayer<I>> for I {
+    fn into_layer(self) -> AsyncInterceptorLayer<I> {
+        AsyncInterceptorLayer::new(self)
+    }
+}
+
 /// A gRPC interceptor that can be used as a [`Layer`],
 ///
 /// See [`Interceptor`] for more details.
@@ -91,7 +109,7 @@ impl<I> InterceptorLayer<I> {
 
 impl<S, I> Layer<S> for InterceptorLayer<I>
 where
-    I: Clone,
+    I: Interceptor + Clone,
 {
     type Service = InterceptedService<S, I>;
 
@@ -114,6 +132,12 @@ impl<I> AsyncInterceptorLayer<I> {
     /// See [`AsyncInterceptor`] for more details.
     pub fn new(interceptor: I) -> Self {
         Self { interceptor }
+    }
+}
+
+impl<I: AsyncInterceptor + Clone> From<I> for AsyncInterceptorLayer<I> {
+    fn from(interceptor: I) -> Self {
+        AsyncInterceptorLayer::new(interceptor)
     }
 }
 
