@@ -48,7 +48,7 @@ impl RoutesBuilder {
 impl<State: Clone + Send + Sync + 'static> Default for Routes<State> {
     fn default() -> Self {
         Self {
-            router: axum::Router::new().fallback(unimplemented),
+            router: axum::Router::new(),
         }
     }
 }
@@ -110,7 +110,7 @@ impl Routes<()> {
     /// See <https://docs.rs/axum/latest/axum/routing/struct.Router.html#a-note-about-performance>
     pub fn prepare(self) -> Self {
         Self {
-            router: self.router.with_state(()),
+            router: self.router.fallback(unimplemented).with_state(()),
         }
     }
 }
