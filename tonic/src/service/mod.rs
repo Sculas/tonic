@@ -7,7 +7,7 @@ pub(crate) mod router;
 
 #[doc(inline)]
 pub use self::interceptor::{
-    AsyncInterceptor, AsyncInterceptorLayer, Interceptor, InterceptorLayer,
+    AsyncInterceptor, AsyncInterceptorLayer, Interceptor, InterceptorLayer, IntoInterceptorLayer,
 };
 pub use self::layered::{LayerExt, Layered};
 #[doc(inline)]
